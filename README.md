@@ -16,7 +16,7 @@ Host control and result reading is performed using an I2C interface, no extra pi
 It was principally designed to work with the SmartEverything board, but could
 be easily adapt and use on every Arduino and Arduino Certified boards.
 
-Written by Matteo Candido <>.
+Written by Zero-2 <Zero2sat@gmail.com>.
 
 ## Repository Contents
 -------------------
@@ -36,7 +36,7 @@ Written by Matteo Candido <>.
 ##  Information
 -------------------
 
-Copyright (c) Amel Technology. All right reserved.
+Copyright (c) Axel Elettronica Srl. All right reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

@@ -34,6 +34,12 @@
 #define CHECK_STATUS_RETRIES 10
 
 /*
+
+Output data rate values.
+By default operating mode is in High Performance
+For the accelerometer all the values are valid.
+For the gyroscope the only valid values are in the range 12.5Hz-1.66Khz
+
 +------------------------------+--------------------------------+
 |		 A/XL_HM_MODE = 1      |	A/XL_HM_MODE = 0 (default)	|
 +------------------------------+--------------------------------+
@@ -63,8 +69,8 @@ enum PowerValues {
 };
 
 struct Sensitivity{
-	byte bits; //FS_XL [1:0] CTRL1_XL Registry
-	float value;
+	byte bits; //Registry value
+	float value; //Sensitivity multiplier value
 };
 
 class LSM6DS3
