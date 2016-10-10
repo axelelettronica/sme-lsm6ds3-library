@@ -1,0 +1,38 @@
+#######################################
+# Syntax Coloring Map for LSM6DS3
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+LSM6DS3_Accelerometer	     KEYWORD3
+LSM6DS3_Gyroscope		     KEYWORD3
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+isActive	    	KEYWORD2
+getXAxis	    	KEYWORD2
+getYAxis	    	KEYWORD2
+getZAxis	  		KEYWORD2
+powerOn	   		 	KEYWORD2
+powerDown	    	KEYWORD2
+changePowerValue	KEYWORD2
+changeSensitivity	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+XL_Sens_2G			LITERAL1
+XL_Sens_4G			LITERAL1
+XL_Sens_8G			LITERAL1
+XL_Sens_16G			LITERAL1
+G_Sens_245_DPS		LITERAL1
+G_Sens_500_DPS		LITERAL1
+G_Sens_1000_DPS		LITERAL1
+G_Sens_2000_DPS		LITERAL1
+
