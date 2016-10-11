@@ -31,7 +31,7 @@
 //Accelerometer class
 LSM6DS3_Accelerometer::LSM6DS3_Accelerometer()
 {
-	_status_sensor_value=XL_STATUS_BIT;
+	_status_sensor_value=XL_ENABLED;
 	_sensor_sensitivity=XL_Sens_2G;
 	_sensor_control_registry=CTRL1_XL_REG_ADDRESS;
 	_bandwidth=XL_Band_400Hz;
@@ -79,7 +79,7 @@ int LSM6DS3_Accelerometer::getRawZAxis()
 
 void LSM6DS3_Accelerometer::setManualBandwidthSelection(){
 	uint8_t data=readRegister(CTRL4_C_REG_ADDRESS);
-	data|=XL_BW_SCAL_ODR_VALUE;
+	data|=XL_BW_SCAL_ODR_MANUAL;
 	writeRegister(CTRL4_C_REG_ADDRESS,data);
 }
 

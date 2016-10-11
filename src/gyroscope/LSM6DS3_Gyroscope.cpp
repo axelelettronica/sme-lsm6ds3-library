@@ -31,7 +31,7 @@
 //Accelerometer class
 LSM6DS3_Gyroscope::LSM6DS3_Gyroscope()
 {
-	_status_sensor_value=G_STATUS_BIT;
+	_status_sensor_value=G_ENABLED;
 	_sensor_sensitivity=G_Sens_245_DPS;
 	_sensor_control_registry=CTRL2_G_REG_ADDRESS;
 }
