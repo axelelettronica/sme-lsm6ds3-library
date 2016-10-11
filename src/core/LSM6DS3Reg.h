@@ -38,6 +38,7 @@
 /******* ACCELEROMETER *******/
 #define CTRL1_XL_REG_ADDRESS		0x10 //Linear acceleration sensor control register 1 (r/w)
 #define CTRL6_C_REG_ADDRESS			0x15 //Angular rate sensor control register 6 (r/w)
+#define CTRL4_C_REG_ADDRESS         0x13 //Control register 4 (r/w)
 //X-Axis value
 #define OUTX_L_XL					0x28
 #define OUTX_H_XL					0x29
@@ -51,6 +52,8 @@
 //high-performance operating mode disabled ( By default High Performance mode is enabled )
 #define XL_HM_MODE_NORM_PERF		0x10 //Normal Mode ( CTRL6_C Registry )
 #define XL_STATUS_BIT				0x01 //GDA
+#define XL_BW_SCAL_ODR_VALUE		0x80 //ODR Value. Bandwidth determined by setting BW_XL[1:0] in CTRL1_XL (10h) register.)
+
 
 /******* GYROSCOPE	 *******/
 #define CTRL2_G_REG_ADDRESS			0x11 //Angular rate sensor control register 2 (r/w).

@@ -30,6 +30,9 @@
 
 LSM6DS3::LSM6DS3() 
 {
+	_axisValues.x=0;
+	_axisValues.y=0;
+	_axisValues.z=0;
 }
 
 boolean LSM6DS3::activate(){
@@ -48,32 +51,29 @@ boolean LSM6DS3::deactivate(){
 	return true;
 }
 
-int LSM6DS3::readCombinedRegistry(unsigned char lsb_registry,unsigned char msb_registry){
-	//Final value is signed int
-	int value=0;
-	signed char readValue;
-	//Do almost 10 tentatives
-	for(int i=0;i<CHECK_STATUS_RETRIES;i++){
-		//First read the status	
-		readValue=readRegister(STATUS_REG_ADDRESS);
-		//If data is available, read it
-		if(readValue & _status_sensor_value){
-			//Read the LSB
-			readValue=readRegister(lsb_registry);
-			value=readValue;
-			//Then the MSB
-			readValue=readRegister(msb_registry);
-			//Join the value into a signed int
-			value=readValue<<8;
-			break;
-		}else{
-			delay(1);
-		}
-	}
-	return value;
+boolean LSM6DS3::readCombinedRegistry(unsigned char lsb_registry,unsigned char msb_registry,int* value){
+	 uint16_t data = 0;
+	 unsigned char  read = 0;
+	 int16_t signed_data = 0;
+
+	 for (int i=0;i<CHECK_STATUS_RETRIES;i++) {
+		 read = readRegister(STATUS_REG_ADDRESS);
+		 if (read & _status_sensor_value) {
+			 read = readRegister(lsb_registry);
+			 data = read;      // LSB
+
+			 read = readRegister(msb_registry);
+			 data |= read << 8; // MSB
+			 signed_data = data;
+			 *value=  signed_data;
+			 return true;
+		} else {
+			 delay (1);
+		 }
+	 }
+	 return false;
 }
 
-// Read a single byte from addressToRead and return it as a byte
 byte LSM6DS3::readRegister(byte regToRead)
 {
 	Wire.beginTransmission(LSM6DS3_ADDRESS);
@@ -86,7 +86,6 @@ byte LSM6DS3::readRegister(byte regToRead)
 	return Wire.read(); //Return this one byte
 }
 
-// Writes a single byte (dataToWrite) into regToWrite
 boolean LSM6DS3::writeRegister(byte regToWrite, byte dataToWrite)
 {
 	uint8_t errorNo;
@@ -149,8 +148,23 @@ boolean LSM6DS3::changeSensitivity(Sensitivity sensitivity){
 	return false;
 }
 
-void LSM6DS3::powerDown(){
+void LSM6DS3::powerOff(){
 	if(isActive()){
 		deactivate();
 	}
+}
+
+float LSM6DS3::getFloatXAxis(){
+	int value=getRawXAxis();
+	return convertToFloatvalue(value);
+}
+
+float LSM6DS3::getFloatYAxis(){
+	int value=getRawYAxis();
+	return convertToFloatvalue(value);
+}
+
+float LSM6DS3::getFloatZAxis(){
+	int value=getRawZAxis();
+	return convertToFloatvalue(value);
 }
