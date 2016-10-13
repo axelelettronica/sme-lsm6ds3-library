@@ -31,50 +31,36 @@
 //Accelerometer class
 LSM6DS3_Accelerometer::LSM6DS3_Accelerometer()
 {
-	_status_sensor_value=XL_ENABLED;
-	_sensor_sensitivity=XL_Sens_2G;
-	_sensor_control_registry=CTRL1_XL_REG_ADDRESS;
-	_bandwidth=XL_Band_400Hz;
+	_sensorSettings.status_sensor_value=XL_ENABLED;
+	_sensorSettings.sensor_control_registry=CTRL1_XL_REG_ADDRESS;
+	_sensorSettings.power_mode_registry=CTRL6_C_REG_ADDRESS;
+	_sensorSettings.operating_mode_reset_mask=XL_OM_RESET_MASK;
+	_sensorSettings.output_data_rate_reset_mask=XL_ODR_RESET_MASK;
+	_sensorSettings.full_scale_reset_mask=XL_FS_RESET_MASK;
+	_sensorSettings.bandwidth_reset_mask=XL_BW_RESET_MASK;
+	_sensorSettings.axisRegistry.XAxis.lowRegistry=OUTX_L_XL;
+	_sensorSettings.axisRegistry.XAxis.highRegistry=OUTX_H_XL;
+	_sensorSettings.axisRegistry.YAxis.lowRegistry=OUTY_L_XL;
+	_sensorSettings.axisRegistry.YAxis.highRegistry=OUTY_H_XL;
+	_sensorSettings.axisRegistry.ZAxis.lowRegistry=OUTZ_L_XL;
+	_sensorSettings.axisRegistry.ZAxis.highRegistry=OUTZ_H_XL;
+	_sensorSettings.bandwidth=XL_Band_400Hz;
+	_sensorSettings.fullScale=XL_FS_2G;
+	_sensorSettings.operatingMode=XL_HM_High_Performance;
 }
 
 boolean LSM6DS3_Accelerometer::changeBandwidth(Bandwidth bandwidth){
 	if(isValidBandwidth(bandwidth))
 	{
-		uint8_t data=readRegister(CTRL4_C_REG_ADDRESS);
-		//Reset Sensitivity bits
-		data&=~bandwidth.bits;
-		_bandwidth=bandwidth;
+		uint8_t data=readRegister(CTRL1_XL_REG_ADDRESS);
+		//Reset Bandwidth bits
+		data&=_sensorSettings.bandwidth_reset_mask;
 		//Set the new value
 		data|=bandwidth.bits;
-		writeRegister(CTRL4_C_REG_ADDRESS,data);
+		writeRegister(CTRL1_XL_REG_ADDRESS,data);
 		return true;
 	}
 	return false;
-}
-
-int LSM6DS3_Accelerometer::getRawXAxis()
-{
-	 int data=0;
-	 if(readCombinedRegistry(OUTX_L_XL,OUTX_H_XL,&data)){
-		 _axisValues.x=data;
-	 }
-	 return _axisValues.x;
-}
-int LSM6DS3_Accelerometer::getRawYAxis()
-{
-	 int data=0;
-	 if(readCombinedRegistry(OUTY_L_XL,OUTY_H_XL,&data)){
-		 _axisValues.y=data;
-	 }
-	 return _axisValues.y;
-}
-int LSM6DS3_Accelerometer::getRawZAxis()
-{
-	 int data=0;
-	 if(readCombinedRegistry(OUTZ_L_XL,OUTZ_H_XL,&data)){
-		 _axisValues.z=data;
-	 }
-	 return _axisValues.z;
 }
 
 void LSM6DS3_Accelerometer::setManualBandwidthSelection(){
@@ -83,9 +69,9 @@ void LSM6DS3_Accelerometer::setManualBandwidthSelection(){
 	writeRegister(CTRL4_C_REG_ADDRESS,data);
 }
 
-boolean LSM6DS3_Accelerometer::isValidSensitivity(Sensitivity sensitivity)
+boolean LSM6DS3_Accelerometer::isValidFullScale(FullScale fs)
 {
-	return sensitivity.range>=XL_Sens_2G.range && sensitivity.range<=XL_Sens_16G.range;
+	return fs.range>=XL_FS_2G.range && fs.range<=XL_FS_16G.range;
 }
 
 boolean LSM6DS3_Accelerometer::isValidBandwidth(Bandwidth bandwidth){
@@ -93,25 +79,35 @@ boolean LSM6DS3_Accelerometer::isValidBandwidth(Bandwidth bandwidth){
 }
 
 //Accelerometer supports all the power mode values
-boolean LSM6DS3_Accelerometer::isValidPowerValue(PowerValues power_value){
+boolean LSM6DS3_Accelerometer::isValidOutputDataRate(OutputDataRate odr){
 	return true;
 }
 
+boolean LSM6DS3_Accelerometer::isValidOperatingMode(OperatingMode om){
+	return om.bits==XL_HM_Normal.bits || om.bits==XL_HM_High_Performance.bits;
+}
+
 void LSM6DS3_Accelerometer::customInit(){
+	LSM6DS3::customInit();
 	//Bandwidth determined by setting BW_XL[1:0] in CTRL1_XL (10h) register.)
 	setManualBandwidthSelection();
+	//Reset to default value
+	changeBandwidth(_sensorSettings.bandwidth);
 }
 
 float LSM6DS3_Accelerometer::convertToFloatvalue(int value){
-	return (float)value*_sensor_sensitivity.sensitivity*(_sensor_sensitivity.range >> 1)/1000;
+	FullScale fullScale=_sensorSettings.fullScale;
+	return (float)value*fullScale.full_scale_value*(fullScale.range >> 1)/1000;
 }
 
 LSM6DS3_Accelerometer accelerometer;
-Sensitivity const XL_Sens_2G={0x00,0.061f,2};
-Sensitivity const XL_Sens_4G={0x08,0.122f,4};
-Sensitivity const XL_Sens_8G={0x0C,0.244f,8};
-Sensitivity const XL_Sens_16G={0x04,0.488f,16};
-Bandwidth const XL_Band_400Hz={0x00,400};
-Bandwidth const XL_Band_200Hz={0x01,200};
-Bandwidth const XL_Band_100Hz={0x02,100};
-Bandwidth const XL_Band_50Hz={0x03,50};
+const OperatingMode XL_HM_Normal={XL_HM_NORMAL_MODE};
+const OperatingMode XL_HM_High_Performance={XL_HM_HIGH_PERFORMANCE};
+const FullScale XL_FS_2G={0x00,0.061f,2};
+const FullScale XL_FS_4G={0x08,0.122f,4};
+const FullScale XL_FS_8G={0x0C,0.244f,8};
+const FullScale XL_FS_16G={0x04,0.488f,16};
+const Bandwidth XL_Band_400Hz={0x00,400};
+const Bandwidth XL_Band_200Hz={0x01,200};
+const Bandwidth XL_Band_100Hz={0x02,100};
+const Bandwidth XL_Band_50Hz={0x03,50};

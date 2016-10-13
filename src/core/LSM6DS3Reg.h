@@ -70,6 +70,11 @@
 ****************** ACCELEROMETER **********************
 ******************************************************/
 
+#define XL_OM_RESET_MASK 0xEF;
+#define XL_ODR_RESET_MASK 0x0F;
+#define XL_FS_RESET_MASK 0xF3;
+#define XL_BW_RESET_MASK 0xFC;
+
 /*******************************
 * Register      : CTRL1_XL
 * Address       : 0X10
@@ -234,6 +239,9 @@ typedef enum{
 ******************** GYROSCOPE ************************
 ******************************************************/
 
+#define G_OM_RESET_MASK 0x7F;
+#define G_ODR_RESET_MASK 0x0F;
+#define G_FS_RESET_MASK 0xF3;
 
 /*******************************
 * Register      : CTRL2_G

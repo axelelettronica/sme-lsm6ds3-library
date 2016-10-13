@@ -30,48 +30,138 @@
 
 LSM6DS3::LSM6DS3() 
 {
-	_axisValues.x=0;
-	_axisValues.y=0;
-	_axisValues.z=0;
+	_sensorSettings.outputDataRate=POWER_104_HZ;
 }
 
-boolean LSM6DS3::activate(){
-	uint8_t data=readRegister(_sensor_control_registry);
-	data|=_powerValue;
-	writeRegister(_sensor_control_registry,data);
-	_isActive=true;
-	return true;
+boolean LSM6DS3::powerOn(OutputDataRate odr){
+	if(!_isActive){
+		uint8_t data=readRegister(WHO_AM_I_REG_ADDRESS);
+		if(data==WHO_AM_I_VALUE){
+			if(changeOutputDataRate(odr)){
+				customInit();
+				_isActive=true;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-boolean LSM6DS3::deactivate(){
-	uint8_t data=readRegister(_sensor_control_registry);
-	data&=~_powerValue;
-	writeRegister(_sensor_control_registry,data);
-	_isActive=false;
-	return true;
+boolean LSM6DS3::powerOff(){
+	if(_isActive){
+		uint8_t data=readRegister(_sensorSettings.sensor_control_registry);
+		data&=_sensorSettings.output_data_rate_reset_mask;
+		writeRegister(_sensorSettings.sensor_control_registry,data);
+		_isActive=false;
+		return true;
+	}
+	return false;
+}
+
+boolean LSM6DS3::changeOutputDataRate(OutputDataRate odr)
+{
+	if(isValidOutputDataRate(odr)){
+		uint8_t data=readRegister(_sensorSettings.sensor_control_registry);
+		//Reset old odr
+		data&=_sensorSettings.output_data_rate_reset_mask;
+		//Set the new odr
+		data|=odr;
+		writeRegister(_sensorSettings.sensor_control_registry,data);
+		return true;
+	}
+	return false;
+}
+
+boolean LSM6DS3::changeFullScale(FullScale sensitivity){
+	if(isValidFullScale(sensitivity))
+	{
+		uint8_t data=readRegister(_sensorSettings.sensor_control_registry);
+		//Reset FullScale bits
+		data&=_sensorSettings.full_scale_reset_mask;
+		//Set the new value
+		data|=sensitivity.bits;
+		writeRegister(_sensorSettings.sensor_control_registry,data);
+		return true;
+	}
+	return false;
+}
+
+boolean LSM6DS3::changeOperatingMode(OperatingMode powerMode){
+	if(isValidOperatingMode(powerMode))
+	{
+		uint8_t data=readRegister(_sensorSettings.power_mode_registry);
+		//Reset OperatingMode bits
+		data&=_sensorSettings.operating_mode_reset_mask;
+		//Set the new value
+		data|=powerMode.bits;
+		writeRegister(_sensorSettings.power_mode_registry,data);
+		return true;
+	}
+	return false;
+}
+
+int LSM6DS3::getRawXAxis()
+{
+	int data=0;
+	if(_isActive){
+		readCombinedRegistry(_sensorSettings.axisRegistry.XAxis.lowRegistry,_sensorSettings.axisRegistry.XAxis.highRegistry,&data);
+	}
+	return data;
+}
+int LSM6DS3::getRawYAxis()
+{
+	int data=0;
+	if(_isActive){
+		readCombinedRegistry(_sensorSettings.axisRegistry.YAxis.lowRegistry,_sensorSettings.axisRegistry.YAxis.highRegistry,&data);
+	}
+	return data;
+}
+int LSM6DS3::getRawZAxis()
+{
+	int data=0;
+	if(_isActive){
+		readCombinedRegistry(_sensorSettings.axisRegistry.ZAxis.lowRegistry,_sensorSettings.axisRegistry.ZAxis.highRegistry,&data);
+	}
+	return data;
+}
+
+
+float LSM6DS3::getRenderedXAxis(){
+	int value=getRawXAxis();
+	return convertToFloatvalue(value);
+}
+
+float LSM6DS3::getRenderedYAxis(){
+	int value=getRawYAxis();
+	return convertToFloatvalue(value);
+}
+
+float LSM6DS3::getRenderedZAxis(){
+	int value=getRawZAxis();
+	return convertToFloatvalue(value);
 }
 
 boolean LSM6DS3::readCombinedRegistry(unsigned char lsb_registry,unsigned char msb_registry,int* value){
-	 uint16_t data = 0;
-	 unsigned char  read = 0;
-	 int16_t signed_data = 0;
+	uint16_t data = 0;
+	unsigned char  read = 0;
+	int16_t signed_data = 0;
 
-	 for (int i=0;i<CHECK_STATUS_RETRIES;i++) {
-		 read = readRegister(STATUS_REG_ADDRESS);
-		 if (read & _status_sensor_value) {
-			 read = readRegister(lsb_registry);
-			 data = read;      // LSB
+	for (int i=0;i<CHECK_STATUS_RETRIES;i++) {
+		read = readRegister(STATUS_REG_ADDRESS);
+		if (read & _sensorSettings.status_sensor_value) {
+			read = readRegister(lsb_registry);
+			data = read;      // LSB
 
-			 read = readRegister(msb_registry);
-			 data |= read << 8; // MSB
-			 signed_data = data;
-			 *value=  signed_data;
-			 return true;
-		} else {
-			 delay (1);
-		 }
-	 }
-	 return false;
+			read = readRegister(msb_registry);
+			data |= read << 8; // MSB
+			signed_data = data;
+			*value=  signed_data;
+			return true;
+			} else {
+			delay (1);
+		}
+	}
+	return false;
 }
 
 byte LSM6DS3::readRegister(byte regToRead)
@@ -102,69 +192,8 @@ boolean LSM6DS3::writeRegister(byte regToWrite, byte dataToWrite)
 	return (errorNo == 0);
 }
 
-boolean LSM6DS3::powerOn(PowerValues power_value){
-	boolean result=false;
-	if(!isActive() && isValidPowerValue(power_value)){
-		uint8_t data=readRegister(WHO_AM_I_REG_ADDRESS);
-		if(data==WHO_AM_I_VALUE){
-			_powerValue=power_value;
-			activate();
-			result=true;
-		}
-	}
-	return result;
+void LSM6DS3::customInit(){
+	changeOperatingMode(_sensorSettings.operatingMode);
+	changeFullScale(_sensorSettings.fullScale);
 }
 
-boolean LSM6DS3::changePowerValue(PowerValues powerValue)
-{
-	bool result=false;
-	if(isValidPowerValue(powerValue)){
-		bool wasActive=isActive();
-		if(wasActive){
-			deactivate();
-		}
-		_powerValue=powerValue;
-		if(wasActive){
-			result=activate();
-		}else{
-			result=true;
-		}
-	}
-	return result;
-}
-
-boolean LSM6DS3::changeSensitivity(Sensitivity sensitivity){
-	if(isValidSensitivity(sensitivity))
-	{
-		uint8_t data=readRegister(_sensor_control_registry);
-		//Reset Sensitivity bits
-		data&=~_sensor_sensitivity.bits;
-		_sensor_sensitivity=sensitivity;
-		//Set the new value
-		data|=_sensor_sensitivity.bits;
-		writeRegister(_sensor_control_registry,data);
-		return true;
-	}
-	return false;
-}
-
-void LSM6DS3::powerOff(){
-	if(isActive()){
-		deactivate();
-	}
-}
-
-float LSM6DS3::getFloatXAxis(){
-	int value=getRawXAxis();
-	return convertToFloatvalue(value);
-}
-
-float LSM6DS3::getFloatYAxis(){
-	int value=getRawYAxis();
-	return convertToFloatvalue(value);
-}
-
-float LSM6DS3::getFloatZAxis(){
-	int value=getRawZAxis();
-	return convertToFloatvalue(value);
-}

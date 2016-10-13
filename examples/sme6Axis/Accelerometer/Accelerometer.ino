@@ -1,16 +1,27 @@
-/*
-    smeAccelerometer Library - Localization Information
-
-    This example print the 3Axis X,Y,Z information
-
-    created 07 Oct 2016
-    by Matteo Candido ()
-
-    This example is in the public domain
-    https://github.com/ameltech
-
-    LSM6DS3  more information available here:
-    http://www.st.com/content/st_com/en/products/mems-and-sensors/inemo-inertial-modules/lsm6ds3.html
+ /*
+ * Accelerometer.ino
+ *
+ *  Created on: 29/09/2016 23:02:00
+ * by Zero-2 (Zero2sat@gmail.com)
+ * 
+ * License Information
+ * -------------------
+ *
+ * Copyright (c) Axel Elettronica Srl. All right reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <Arduino.h>
@@ -30,16 +41,19 @@ void setup() {
 void loop() {
     SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
     SerialUSB.println("Accelerometer Values ");
-    int x=accelerometer.getXAxis();
-    int y=accelerometer.getYAxis();
-    int z=accelerometer.getZAxis();
-    SerialUSB.print("  X-Axis = ");
-    SerialUSB.print(x, DEC);
-    SerialUSB.print("  Y-Axis = ");
-    SerialUSB.print(y, DEC);
-    SerialUSB.print("  Z-Axis = ");
-    SerialUSB.println(z, DEC);
-    SerialUSB.println("");
+    SerialUSB.print("Raw  X = ");
+    SerialUSB.print(accelerometer.getRawXAxis(), DEC);
+    SerialUSB.print(" Y = ");
+    SerialUSB.print(accelerometer.getRawYAxis(), DEC);
+    SerialUSB.print(" Z = ");
+    SerialUSB.println(accelerometer.getRawZAxis(), DEC);
+    SerialUSB.print("X = ");
+    SerialUSB.print(accelerometer.getRenderedXAxis(), DEC);
+    SerialUSB.print("g  Y = ");
+    SerialUSB.print(accelerometer.getRenderedYAxis(), DEC);
+    SerialUSB.print("g  Z = ");
+    SerialUSB.print(accelerometer.getRenderedZAxis(), DEC);
+    SerialUSB.println("g");
     SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
     delay(1000);
 }

@@ -55,23 +55,27 @@ For the gyroscope the only valid values are in the range 12.5Hz-1.66Khz
 |  6.66 kHz (high performance) |   6.66 kHz (high performance)  |
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
-enum PowerValues {
-	POWER_12_5_HZ=0x10,
-	POWER_26_HZ=0x20,
-	POWER_52_HZ=0x30,
-	POWER_104_HZ=0x40,
-	POWER_208_HZ=0x50,
-	POWER_416_HZ=0x60,
-	POWER_833_HZ=0x70,
-	POWER_1_66_KHZ=0x80,
-	POWER_3_33_KHZ=0x90,
-	POWER_6_66_KHZ=0xA0
+enum OutputDataRate {
+	POWER_12_5_HZ=	0x10,
+	POWER_26_HZ=	0x20,
+	POWER_52_HZ=	0x30,
+	POWER_104_HZ=	0x40,
+	POWER_208_HZ=	0x50,
+	POWER_416_HZ=	0x60,
+	POWER_833_HZ=	0x70,
+	POWER_1_66_KHZ=	0x80,
+	POWER_3_33_KHZ=	0x90,
+	POWER_6_66_KHZ=	0xA0
+};
+
+struct OperatingMode{
+	byte bits;
 };
 
 //Sensitivity Struct
-struct Sensitivity{
+struct FullScale{
 	byte bits; //Registry value
-	float sensitivity; //Sensitivity value
+	float full_scale_value; //Sensitivity value
 	int range;
 };
 
@@ -81,11 +85,30 @@ struct Bandwidth{
 	int value; //Bandwidth value
 };
 
-//Support struct for internal operations
 struct Axis{
-	int x;
-	int y;
-	int z;
+	byte lowRegistry;
+	byte highRegistry;
+};
+
+struct AxisRegistry{
+	Axis XAxis;
+	Axis YAxis;
+	Axis ZAxis;
+};
+
+struct SensorSettings{
+	byte			power_mode_registry;
+	byte			status_sensor_value; //Value of the Status Registry for the specific sensor
+	byte			sensor_control_registry; //Address of the Status Registry for the specific sensor
+	Bandwidth		bandwidth;
+	FullScale		fullScale;
+	OperatingMode	operatingMode;
+	OutputDataRate	outputDataRate;
+	AxisRegistry	axisRegistry;
+	byte			output_data_rate_reset_mask;
+	byte			operating_mode_reset_mask;
+	byte			full_scale_reset_mask;
+	byte			bandwidth_reset_mask;
 };
 
 //Base class with common operations for both accelerometer and gyroscope sensor
@@ -95,65 +118,56 @@ class LSM6DS3
 		LSM6DS3();
 		~LSM6DS3() 
 		{
-			if(isActive())
+			if(_isActive)
 			{
 				powerOff();	
 			}
 		};
 
 		/** Concrete methods **/
-
-		//Check if sensor is active
+		//Check if sensor is active or not
 		boolean isActive(){return _isActive;};
 		//Move the sensor to power on state
-		boolean powerOn(PowerValues power_value=POWER_104_HZ);
+		boolean powerOn(OutputDataRate power_value=POWER_104_HZ);
 		//Move the sensor to power down state
-		void powerOff();
+		boolean powerOff();
 		//Change sensor power value. This command, if sensor previously was active, power off the sensor, and then reactivate it 
-		boolean changePowerValue(PowerValues powerValue);
+		boolean changeOutputDataRate(OutputDataRate powerValue);
 		//Change the sensor sensitivity
-		boolean changeSensitivity(Sensitivity sensitivity_bits);
+		boolean changeFullScale(FullScale sensitivity_bits);
+		//Change the power mode (Normal or High Performance)
+		boolean changeOperatingMode(OperatingMode powerMode);
 		//Return the float converted X-Axis value
-		float getFloatXAxis();
+		float getRenderedXAxis();
 		//Return the float converted Y-Axis value
-		float getFloatYAxis();
+		float getRenderedYAxis();
 		//Return the float converted Z-Axis value
-		float getFloatZAxis();
-
-		/** Virtual Methods **/
-
+		float getRenderedZAxis();
 		//Return the raw X-Axis value
-		virtual int getRawXAxis()=0;
+		int getRawXAxis();
 		//Return the raw Y-Axis value
-		virtual int getRawYAxis()=0;
+		int getRawYAxis();
 		//Return the raw Z-Axis value
-		virtual int getRawZAxis()=0;
+		int getRawZAxis();		
 
 		
 	protected:
 		//Variables
-		Axis		_axisValues;
-		PowerValues _powerValue; //Actual sensor power value
-		boolean		_isActive; //True if specific sensor is active , False if is in power down
-		Sensitivity _sensor_sensitivity;//Sensor sensitivity
-		byte		_status_sensor_value; //Value of the Status Registry for the specific sensor
-		byte		_sensor_control_registry; //Address of the Status Registry for the specific sensor
-
+		boolean			_isActive; //True if specific sensor is active , False if is in power down
+		SensorSettings	_sensorSettings;
 		//Methods
 		//Virtual Methods
 		//Check if power value is valid or not for the specific sensor
-		virtual boolean isValidPowerValue(PowerValues power_value)=0;
+		virtual boolean isValidOutputDataRate(OutputDataRate power_value)=0;
 		//Check if sensitivity is valid or not for the specific sensor
-		virtual boolean isValidSensitivity(Sensitivity sensitivity)=0;
+		virtual boolean isValidFullScale(FullScale sensitivity)=0;
+		//Check if power mode is valid or not for the specific sensor
+		virtual boolean isValidOperatingMode(OperatingMode powerMode)=0;
 		//Convert raw value to sensor specific float value
 		virtual float convertToFloatvalue(int value)=0;
 		//execute specific sensor initialization
-		virtual void customInit()=0;
+		virtual void customInit();
 		//Concrete methods
-		//Activate sensor
-		boolean activate();
-		//Deactivate sensor
-		boolean deactivate();
 		//Read value from registry
 		byte readRegister( byte regToRead);
 		//Write value to registry
@@ -167,48 +181,45 @@ class LSM6DS3
 class LSM6DS3_Accelerometer: public LSM6DS3{
 	public:
 		LSM6DS3_Accelerometer();
-		int getRawXAxis();
-		int getRawYAxis();
-		int getRawZAxis();
 		//Change the bandwidth value
 		boolean changeBandwidth(Bandwidth bandwidth);
 	protected:
-		boolean isValidPowerValue(PowerValues power_value);
-		boolean isValidSensitivity(Sensitivity sensitivity);
+		boolean isValidOutputDataRate(OutputDataRate power_value);
+		boolean isValidFullScale(FullScale sensitivity);
 		boolean isValidBandwidth(Bandwidth bandwidth);
+		boolean isValidOperatingMode(OperatingMode powerMode);
 		float convertToFloatvalue(int value);
 		void setManualBandwidthSelection();
 		void customInit();
-	private:
-		Bandwidth _bandwidth;
 };
 
 //Gyroscope class with specific sensor implementation
 class LSM6DS3_Gyroscope: public LSM6DS3{
 	public:
 		LSM6DS3_Gyroscope();
-		int getRawXAxis();
-		int getRawYAxis();
-		int getRawZAxis();
 	protected:
-		boolean isValidPowerValue(PowerValues power_value);
-		boolean isValidSensitivity(Sensitivity sensitivity);
+		boolean isValidOutputDataRate(OutputDataRate power_value);
+		boolean isValidFullScale(FullScale sensitivity);
+		boolean isValidOperatingMode(OperatingMode powerMode);
 		float convertToFloatvalue(int value);
-		void customInit();
 };
 
 extern LSM6DS3_Accelerometer accelerometer;
 extern LSM6DS3_Gyroscope gyroscope;
 //Gyroscope values
-extern const Sensitivity G_Sens_245_DPS;
-extern const Sensitivity G_Sens_500_DPS;
-extern const Sensitivity G_Sens_1000_DPS;
-extern const Sensitivity G_Sens_2000_DPS;
+extern const FullScale G_FS_245_DPS;
+extern const FullScale G_FS_500_DPS;
+extern const FullScale G_FS_1000_DPS;
+extern const FullScale G_FS_2000_DPS;
+extern const OperatingMode G_HM_Normal;
+extern const OperatingMode G_HM_High_Performance;
 //Accelerometer values
-extern const Sensitivity XL_Sens_2G;
-extern const Sensitivity XL_Sens_4G;
-extern const Sensitivity XL_Sens_8G;
-extern const Sensitivity XL_Sens_16G;
+extern const OperatingMode XL_HM_Normal;
+extern const OperatingMode XL_HM_High_Performance;
+extern const FullScale XL_FS_2G;
+extern const FullScale XL_FS_4G;
+extern const FullScale XL_FS_8G;
+extern const FullScale XL_FS_16G;
 extern const Bandwidth XL_Band_400Hz;
 extern const Bandwidth XL_Band_200Hz;
 extern const Bandwidth XL_Band_100Hz;
