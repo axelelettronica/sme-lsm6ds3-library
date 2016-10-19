@@ -95,11 +95,11 @@ void printMenu(){
 				SerialUSB.print("     Z = ");
 				SerialUSB.println(accelerometer.getRawZAxis(), DEC);
 				SerialUSB.print(" X = ");
-				SerialUSB.print(accelerometer.getRenderedXAxis(), DEC);
+				SerialUSB.print(accelerometer.getConvertedXAxis(), DEC);
 				SerialUSB.print("g Y = ");
-				SerialUSB.print(accelerometer.getRenderedYAxis(), DEC);
+				SerialUSB.print(accelerometer.getConvertedYAxis(), DEC);
 				SerialUSB.print("g Z = ");
-				SerialUSB.print(accelerometer.getRenderedZAxis(), DEC);
+				SerialUSB.print(accelerometer.getConvertedZAxis(), DEC);
 				SerialUSB.println("g");
 				SerialUSB.println("*********************************************");
 				delay(1000);

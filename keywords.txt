@@ -11,39 +11,46 @@ LSM6DS3_Gyroscope		     KEYWORD3
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
-Sensitivity 		KEYWORD1
-Bandwidth 	 		KEYWORD1
-PowerValues			KEYWORD1
+OutputDataRate		KEYWORD1
+OperatingMode 		KEYWORD1
+FullScale 	 		KEYWORD1
+Bandwidth			KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-isActive	    	KEYWORD2
-powerOn	   		 	KEYWORD2
-powerOff	    	KEYWORD2
-changePowerValue	KEYWORD2
-changeSensitivity	KEYWORD2
-getFloatXAxis    	KEYWORD2
-getFloatYAxis    	KEYWORD2
-getFloatZAxis  		KEYWORD2
-getRawXAxis    		KEYWORD2
-getRawYAxis    		KEYWORD2
-getRawZAxis 		KEYWORD2
-changeBandwidth		KEYWORD2
+isActive	    		KEYWORD2
+powerOn	   		 		KEYWORD2
+powerOff	    		KEYWORD2
+changeOutputDataRate	KEYWORD2
+changeFullScale			KEYWORD2
+changeOperatingMode		KEYWORD2
+changeBandwidth			KEYWORD2
+getConvertedXAxis  		KEYWORD2
+getConvertedYAxis  		KEYWORD2
+getConvertedZAxis		KEYWORD2
+getRawXAxis    			KEYWORD2
+getRawYAxis    			KEYWORD2
+getRawZAxis 			KEYWORD2
+
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-XL_Sens_2G			LITERAL1
-XL_Sens_4G			LITERAL1
-XL_Sens_8G			LITERAL1
-XL_Sens_16G			LITERAL1
-XL_Band_400Hz		LITERAL1
-XL_Band_200Hz		LITERAL1
-XL_Band_100Hz		LITERAL1
-XL_Band_50Hz		LITERAL1
-G_Sens_245_DPS		LITERAL1
-G_Sens_500_DPS		LITERAL1
-G_Sens_1000_DPS		LITERAL1
-G_Sens_2000_DPS		LITERAL1
+XL_HM_Normal			LITERAL1
+XL_HM_High_Performance	LITERAL1
+XL_FS_2G				LITERAL1
+XL_FS_4G				LITERAL1
+XL_FS_8G				LITERAL1
+XL_FS_16G				LITERAL1
+XL_Band_400Hz			LITERAL1
+XL_Band_200Hz			LITERAL1
+XL_Band_100Hz			LITERAL1
+XL_Band_50Hz			LITERAL1
+G_HM_Normal				LITERAL1
+G_HM_High_Performance	LITERAL1
+G_FS_245_DPS			LITERAL1
+G_FS_500_DPS			LITERAL1
+G_FS_1000_DPS			LITERAL1
+G_FS_2000_DPS			LITERAL1
 

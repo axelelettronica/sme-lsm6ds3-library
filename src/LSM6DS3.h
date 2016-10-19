@@ -137,12 +137,12 @@ class LSM6DS3
 		boolean changeFullScale(FullScale sensitivity_bits);
 		//Change the power mode (Normal or High Performance)
 		boolean changeOperatingMode(OperatingMode powerMode);
-		//Return the float converted X-Axis value
-		float getRenderedXAxis();
-		//Return the float converted Y-Axis value
-		float getRenderedYAxis();
-		//Return the float converted Z-Axis value
-		float getRenderedZAxis();
+		//Return the converted X-Axis value
+		float getConvertedXAxis();
+		//Return the converted Y-Axis value
+		float getConvertedYAxis();
+		//Return the converted Z-Axis value
+		float getConvertedZAxis();
 		//Return the raw X-Axis value
 		int getRawXAxis();
 		//Return the raw Y-Axis value
@@ -163,8 +163,8 @@ class LSM6DS3
 		virtual boolean isValidFullScale(FullScale sensitivity)=0;
 		//Check if power mode is valid or not for the specific sensor
 		virtual boolean isValidOperatingMode(OperatingMode powerMode)=0;
-		//Convert raw value to sensor specific float value
-		virtual float convertToFloatvalue(int value)=0;
+		//Convert raw value to sensor specific value
+		virtual float convertAxisValue(int value)=0;
 		//execute specific sensor initialization
 		virtual void customInit();
 		//Concrete methods
@@ -174,6 +174,7 @@ class LSM6DS3
 		boolean writeRegister(byte regToWrite, byte dataToWrite);
 		//Read 16bits value from two 8 bits registry
 		boolean readCombinedRegistry(unsigned char lsb_registry,unsigned char msb_registry,int* value);
+		void changeRegistryValue(byte registry,byte resetMask,byte value);
 
 };
 
@@ -188,7 +189,7 @@ class LSM6DS3_Accelerometer: public LSM6DS3{
 		boolean isValidFullScale(FullScale sensitivity);
 		boolean isValidBandwidth(Bandwidth bandwidth);
 		boolean isValidOperatingMode(OperatingMode powerMode);
-		float convertToFloatvalue(int value);
+		float convertAxisValue(int value);
 		void setManualBandwidthSelection();
 		void customInit();
 };
@@ -201,7 +202,7 @@ class LSM6DS3_Gyroscope: public LSM6DS3{
 		boolean isValidOutputDataRate(OutputDataRate power_value);
 		boolean isValidFullScale(FullScale sensitivity);
 		boolean isValidOperatingMode(OperatingMode powerMode);
-		float convertToFloatvalue(int value);
+		float convertAxisValue(int value);
 };
 
 extern LSM6DS3_Accelerometer accelerometer;

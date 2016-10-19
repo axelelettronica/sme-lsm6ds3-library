@@ -48,11 +48,11 @@ void loop() {
     SerialUSB.print("  Z = ");
     SerialUSB.println(gyroscope.getRawZAxis(), DEC);
     SerialUSB.print("X = ");
-    SerialUSB.print(gyroscope.getRenderedXAxis(), DEC);
+    SerialUSB.print(gyroscope.getConvertedXAxis(), DEC);
     SerialUSB.print("dms  Y = ");
-    SerialUSB.print(gyroscope.getRenderedYAxis(), DEC);
+    SerialUSB.print(gyroscope.getConvertedYAxis(), DEC);
     SerialUSB.print("dms  Z = ");
-    SerialUSB.print(gyroscope.getRenderedZAxis(), DEC);
+    SerialUSB.print(gyroscope.getConvertedZAxis(), DEC);
     SerialUSB.println("dms");
     SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
     delay(1000);

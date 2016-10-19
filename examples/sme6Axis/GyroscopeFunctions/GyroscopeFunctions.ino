@@ -61,7 +61,8 @@ void printMenu(){
 	SerialUSB.println("18 - High Performance (Default)");
 	SerialUSB.println("Choose a command");
 	while(Serial.available() == 0){}
-	int value=SerialUSB.parseInt();
+	String read=SerialUSB.readString();
+	int value=read.toInt();
 	switch(value){
 		case 1:
 			SerialUSB.println("Power On");

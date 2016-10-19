@@ -61,13 +61,9 @@ boolean LSM6DS3_Gyroscope::isValidOperatingMode(OperatingMode om){
 	return om.bits==G_HM_Normal.bits || om.bits==G_HM_High_Performance.bits;
 }
 
-float LSM6DS3_Gyroscope::convertToFloatvalue(int value){
+float LSM6DS3_Gyroscope::convertAxisValue(int value){
 	FullScale fullScale=_sensorSettings.fullScale;
-	uint8_t gyroRangeDivisor =  fullScale.range / 125;
-	if ( fullScale.range== G_FS_245_DPS.range) {
-		gyroRangeDivisor = 2;
-	}
-	return  (float)value *fullScale.full_scale_value * (gyroRangeDivisor) / 1000;
+	return  (float)value *fullScale.full_scale_value / 1000;
 }
 
 LSM6DS3_Gyroscope gyroscope;

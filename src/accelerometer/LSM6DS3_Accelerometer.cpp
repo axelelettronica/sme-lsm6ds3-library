@@ -52,12 +52,8 @@ LSM6DS3_Accelerometer::LSM6DS3_Accelerometer()
 boolean LSM6DS3_Accelerometer::changeBandwidth(Bandwidth bandwidth){
 	if(isValidBandwidth(bandwidth))
 	{
-		uint8_t data=readRegister(CTRL1_XL_REG_ADDRESS);
-		//Reset Bandwidth bits
-		data&=_sensorSettings.bandwidth_reset_mask;
-		//Set the new value
-		data|=bandwidth.bits;
-		writeRegister(CTRL1_XL_REG_ADDRESS,data);
+		_sensorSettings.bandwidth=bandwidth;
+		changeRegistryValue(CTRL1_XL_REG_ADDRESS,_sensorSettings.bandwidth_reset_mask,bandwidth.bits);
 		return true;
 	}
 	return false;
@@ -95,9 +91,9 @@ void LSM6DS3_Accelerometer::customInit(){
 	changeBandwidth(_sensorSettings.bandwidth);
 }
 
-float LSM6DS3_Accelerometer::convertToFloatvalue(int value){
+float LSM6DS3_Accelerometer::convertAxisValue(int value){
 	FullScale fullScale=_sensorSettings.fullScale;
-	return (float)value*fullScale.full_scale_value*(fullScale.range >> 1)/1000;
+	return (float)value*fullScale.full_scale_value/1000;
 }
 
 LSM6DS3_Accelerometer accelerometer;
