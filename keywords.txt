@@ -19,6 +19,7 @@ Bandwidth			KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
+begin					KEYWORD2
 isActive	    		KEYWORD2
 powerOn	   		 		KEYWORD2
 powerOff	    		KEYWORD2
@@ -32,6 +33,8 @@ getConvertedZAxis		KEYWORD2
 getRawXAxis    			KEYWORD2
 getRawYAxis    			KEYWORD2
 getRawZAxis 			KEYWORD2
+resetToDefault			KEYWORD2
+getStatus				KEYWORD2
 
 
 #######################################

@@ -30,31 +30,37 @@
 
 void setup() {
     Wire.begin();
-    SerialUSB.begin(115200);    
-    if(accelerometer.powerOn()){
-        SerialUSB.println("Accelerometer Power ON");
-    }else{
-        SerialUSB.println("Accelerometer Not Powered On");
-    }
+    Serial.begin(115200);    
+    while(!Serial){};
+	accelerometer.begin();
+	if(accelerometer.isActive()){
+		Serial.println("Accelerometer already active");
+	}else{
+		if(accelerometer.powerOn()){
+			Serial.println("Accelerometer Power ON");
+		}else{
+			Serial.println("Accelerometer Not Powered On");
+		}
+	}
 }
 
 void loop() {
-    SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
-    SerialUSB.println("Accelerometer Values ");
-    SerialUSB.print("Raw  X = ");
-    SerialUSB.print(accelerometer.getRawXAxis(), DEC);
-    SerialUSB.print(" Y = ");
-    SerialUSB.print(accelerometer.getRawYAxis(), DEC);
-    SerialUSB.print(" Z = ");
-    SerialUSB.println(accelerometer.getRawZAxis(), DEC);
-    SerialUSB.print("X = ");
-    SerialUSB.print(accelerometer.getConvertedXAxis(), DEC);
-    SerialUSB.print("g  Y = ");
-    SerialUSB.print(accelerometer.getConvertedYAxis(), DEC);
-    SerialUSB.print("g  Z = ");
-    SerialUSB.print(accelerometer.getConvertedZAxis(), DEC);
-    SerialUSB.println("g");
-    SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
+    Serial.println("++++++++++++++++++++++++++++++++++++++++");
+    Serial.println("Accelerometer Values ");
+    Serial.print("Raw  X = ");
+    Serial.print(accelerometer.getRawXAxis());
+    Serial.print(" Y = ");
+    Serial.print(accelerometer.getRawYAxis());
+    Serial.print(" Z = ");
+    Serial.println(accelerometer.getRawZAxis());
+    Serial.print("X = ");
+    Serial.print(accelerometer.getConvertedXAxis(), 2);
+    Serial.print("g  Y = ");
+    Serial.print(accelerometer.getConvertedYAxis(), 2);
+    Serial.print("g  Z = ");
+    Serial.print(accelerometer.getConvertedZAxis(), 2);
+    Serial.println("g");
+    Serial.println("++++++++++++++++++++++++++++++++++++++++");
     delay(1000);
 }
 

@@ -100,10 +100,7 @@ struct SensorSettings{
 	byte			power_mode_registry;
 	byte			status_sensor_value; //Value of the Status Registry for the specific sensor
 	byte			sensor_control_registry; //Address of the Status Registry for the specific sensor
-	Bandwidth		bandwidth;
 	FullScale		fullScale;
-	OperatingMode	operatingMode;
-	OutputDataRate	outputDataRate;
 	AxisRegistry	axisRegistry;
 	byte			output_data_rate_reset_mask;
 	byte			operating_mode_reset_mask;
@@ -148,8 +145,11 @@ class LSM6DS3
 		//Return the raw Y-Axis value
 		int getRawYAxis();
 		//Return the raw Z-Axis value
-		int getRawZAxis();		
-
+		int getRawZAxis();	
+		//Initialize the sensor
+		void begin();
+		//Reset registry values to default
+		void resetToDefault();
 		
 	protected:
 		//Variables
@@ -165,8 +165,6 @@ class LSM6DS3
 		virtual boolean isValidOperatingMode(OperatingMode powerMode)=0;
 		//Convert raw value to sensor specific value
 		virtual float convertAxisValue(int value)=0;
-		//execute specific sensor initialization
-		virtual void customInit();
 		//Concrete methods
 		//Read value from registry
 		byte readRegister( byte regToRead);
@@ -175,6 +173,7 @@ class LSM6DS3
 		//Read 16bits value from two 8 bits registry
 		boolean readCombinedRegistry(unsigned char lsb_registry,unsigned char msb_registry,int* value);
 		void changeRegistryValue(byte registry,byte resetMask,byte value);
+		virtual FullScale readFullScaleFromRegistry()=0;
 
 };
 
@@ -184,6 +183,8 @@ class LSM6DS3_Accelerometer: public LSM6DS3{
 		LSM6DS3_Accelerometer();
 		//Change the bandwidth value
 		boolean changeBandwidth(Bandwidth bandwidth);
+		String getStatus();
+		void resetToDefault();
 	protected:
 		boolean isValidOutputDataRate(OutputDataRate power_value);
 		boolean isValidFullScale(FullScale sensitivity);
@@ -191,18 +192,21 @@ class LSM6DS3_Accelerometer: public LSM6DS3{
 		boolean isValidOperatingMode(OperatingMode powerMode);
 		float convertAxisValue(int value);
 		void setManualBandwidthSelection();
-		void customInit();
+		FullScale readFullScaleFromRegistry();
 };
 
 //Gyroscope class with specific sensor implementation
 class LSM6DS3_Gyroscope: public LSM6DS3{
 	public:
 		LSM6DS3_Gyroscope();
+		String getStatus();
+		void resetToDefault();
 	protected:
 		boolean isValidOutputDataRate(OutputDataRate power_value);
 		boolean isValidFullScale(FullScale sensitivity);
 		boolean isValidOperatingMode(OperatingMode powerMode);
 		float convertAxisValue(int value);
+		FullScale readFullScaleFromRegistry();
 };
 
 extern LSM6DS3_Accelerometer accelerometer;

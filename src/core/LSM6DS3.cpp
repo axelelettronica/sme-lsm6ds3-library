@@ -32,7 +32,6 @@
 
 LSM6DS3::LSM6DS3() 
 {
-	_sensorSettings.outputDataRate=POWER_104_HZ;
 }
 
 boolean LSM6DS3::powerOn(OutputDataRate odr){
@@ -40,7 +39,6 @@ boolean LSM6DS3::powerOn(OutputDataRate odr){
 		uint8_t data=readRegister(WHO_AM_I_REG_ADDRESS);
 		if(data==WHO_AM_I_VALUE){
 			if(changeOutputDataRate(odr)){
-				customInit();
 				_isActive=true;
 				return true;
 			}
@@ -63,7 +61,6 @@ boolean LSM6DS3::powerOff(){
 boolean LSM6DS3::changeOutputDataRate(OutputDataRate odr)
 {
 	if(isValidOutputDataRate(odr)){
-		_sensorSettings.outputDataRate=odr;
 		changeRegistryValue(_sensorSettings.sensor_control_registry,_sensorSettings.output_data_rate_reset_mask,odr);
 		return true;
 	}
@@ -83,7 +80,6 @@ boolean LSM6DS3::changeFullScale(FullScale sensitivity){
 boolean LSM6DS3::changeOperatingMode(OperatingMode operatingMode){
 	if(isValidOperatingMode(operatingMode))
 	{
-		_sensorSettings.operatingMode=operatingMode;
 		changeRegistryValue(_sensorSettings.power_mode_registry,_sensorSettings.operating_mode_reset_mask,operatingMode.bits);
 		return true;
 	}
@@ -130,6 +126,19 @@ int LSM6DS3::getRawZAxis()
 	return data;
 }
 
+
+void LSM6DS3::begin()
+{
+	//Read current value from the register
+	_sensorSettings.fullScale=readFullScaleFromRegistry();
+	byte odr=readRegister(_sensorSettings.sensor_control_registry)&~_sensorSettings.output_data_rate_reset_mask;
+	_isActive=odr!=0x00;
+}
+
+void LSM6DS3::resetToDefault()
+{
+	changeOutputDataRate(POWER_104_HZ);
+}
 
 //Protected methods
 
@@ -192,9 +201,3 @@ boolean LSM6DS3::writeRegister(byte regToWrite, byte dataToWrite)
 	errorNo = Wire.endTransmission(); //Stop transmitting
 	return (errorNo == 0);
 }
-
-void LSM6DS3::customInit(){
-	changeOperatingMode(_sensorSettings.operatingMode);
-	changeFullScale(_sensorSettings.fullScale);
-}
-

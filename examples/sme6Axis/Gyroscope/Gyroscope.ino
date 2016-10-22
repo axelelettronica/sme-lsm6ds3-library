@@ -30,31 +30,37 @@
 
 void setup() {
     Wire.begin();
-    SerialUSB.begin(115200);    
-    if(gyroscope.powerOn()){
-        SerialUSB.println("Gyroscope Power ON");
+    Serial.begin(115200);   
+    while(!Serial){}; 
+    gyroscope.begin();
+    if(gyroscope.isActive()){
+        Serial.println("Gyroscope Already Active");
     }else{
-        SerialUSB.println("Gyroscope Not Powered On");
+        if(gyroscope.powerOn()){
+            Serial.println("Gyroscope Power ON");
+        }else{
+            Serial.println("Gyroscope Not Powered On");
+        }
     }
 }
 
 void loop() {
-    SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
-    SerialUSB.println("Gyroscope Values ");
-    SerialUSB.print("Raw  X = ");
-    SerialUSB.print(gyroscope.getRawXAxis(), DEC);
-    SerialUSB.print("  Y = ");
-    SerialUSB.print(gyroscope.getRawYAxis(), DEC);
-    SerialUSB.print("  Z = ");
-    SerialUSB.println(gyroscope.getRawZAxis(), DEC);
-    SerialUSB.print("X = ");
-    SerialUSB.print(gyroscope.getConvertedXAxis(), DEC);
-    SerialUSB.print("dms  Y = ");
-    SerialUSB.print(gyroscope.getConvertedYAxis(), DEC);
-    SerialUSB.print("dms  Z = ");
-    SerialUSB.print(gyroscope.getConvertedZAxis(), DEC);
-    SerialUSB.println("dms");
-    SerialUSB.println("++++++++++++++++++++++++++++++++++++++++");
+    Serial.println("++++++++++++++++++++++++++++++++++++++++");
+    Serial.println("Gyroscope Values ");
+    Serial.print("Raw  X = ");
+    Serial.print(gyroscope.getRawXAxis());
+    Serial.print("  Y = ");
+    Serial.print(gyroscope.getRawYAxis());
+    Serial.print("  Z = ");
+    Serial.println(gyroscope.getRawZAxis());
+    Serial.print("X = ");
+    Serial.print(gyroscope.getConvertedXAxis(), 2);
+    Serial.print("dms  Y = ");
+    Serial.print(gyroscope.getConvertedYAxis(), 2);
+    Serial.print("dms  Z = ");
+    Serial.print(gyroscope.getConvertedZAxis(), 2);
+    Serial.println("dms");
+    Serial.println("++++++++++++++++++++++++++++++++++++++++");
     delay(1000);
 }
 
