@@ -36,7 +36,6 @@ getRawZAxis 			KEYWORD2
 resetToDefault			KEYWORD2
 getStatus				KEYWORD2
 
-
 #######################################
 # Constants (LITERAL1)
 #######################################
